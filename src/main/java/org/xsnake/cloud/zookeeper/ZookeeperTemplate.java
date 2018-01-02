@@ -25,7 +25,7 @@ public class ZookeeperTemplate {
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
-	public void tempDir(String node) throws KeeperException, InterruptedException, IOException {
+	public void $dir(String node) throws KeeperException, InterruptedException, IOException {
 		dir(node, null, CreateMode.EPHEMERAL);
 	}
 	
@@ -37,7 +37,7 @@ public class ZookeeperTemplate {
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
-	public void tempDir(String node,String data) throws KeeperException, InterruptedException, IOException {
+	public void $dir(String node,byte[] data) throws KeeperException, InterruptedException, IOException {
 		dir(node, data, CreateMode.EPHEMERAL);
 	}
 
@@ -60,7 +60,7 @@ public class ZookeeperTemplate {
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
-	public void dir(String node,String data) throws KeeperException, InterruptedException, IOException {
+	public void dir(String node,byte[] data) throws KeeperException, InterruptedException, IOException {
 		dir(node, data, CreateMode.PERSISTENT);
 	}
 	
@@ -73,8 +73,8 @@ public class ZookeeperTemplate {
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
-	public void dir(String path,String value,CreateMode createMode)throws KeeperException, InterruptedException, IOException{
-		byte[] data = value != null ? value.getBytes() : null;
+	private void dir(String path,byte[] value,CreateMode createMode)throws KeeperException, InterruptedException, IOException{
+		byte[] data = value != null ? value : null;
 		if(zooKeeper.exists(path, null)==null){
 			zooKeeper.create(path, data, ZooDefs.Ids.OPEN_ACL_UNSAFE, createMode);
 		}else{
@@ -89,12 +89,12 @@ public class ZookeeperTemplate {
 	 * @throws KeeperException
 	 * @throws InterruptedException
 	 */
-	public String dirData(String path) throws KeeperException, InterruptedException{
+	public byte[] data(String path) throws KeeperException, InterruptedException{
 		byte[] data = zooKeeper.getData(path, null, null);
 		if(data == null){
 			return null;
 		}
-		return new String(data);
+		return data;
 	}
 	
 	
@@ -113,12 +113,12 @@ public class ZookeeperTemplate {
 		zooKeeper.delete(path, -1);
 	}
 	
-	public void onChildrenChange(String path,Watcher watcher) throws KeeperException, InterruptedException{
+	public void onChange(String path,Watcher watcher) throws KeeperException, InterruptedException{
 		zooKeeper.getChildren(path, new PermanentWatcher(zooKeeper,path,watcher));
 	}
 	
 	public List<String> getChildren(String path) throws KeeperException, InterruptedException{
-		return zooKeeper.getChildren(path,null);	
+		return zooKeeper.getChildren(path,null);
 	}
 	
 	public static class PermanentWatcher implements Watcher{

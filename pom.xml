@@ -1,10 +1,8 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.xsnake.cloud</groupId>
-  <artifactId>zookeeper</artifactId>
-  <version>0.0.1-SNAPSHOT</version>
-  
-  
+  <groupId>org.xsnake</groupId>
+  <artifactId>zookeeper-starter</artifactId>
+  <version>1.0.1</version>
   
 	<organization>
 		<name>xsnake</name>
@@ -36,15 +34,15 @@
 		<connection>scm:git:git@github.com:mousejerry1220/zookeeper.git</connection>
 		<developerConnection>scm:git:git@github.com:mousejerry1220/zookeeper.git</developerConnection>
 		<url>git@github.com:mousejerry1220/zookeeper.git</url>
-	   	<tag>zookeeper-1.01-RELEASE</tag>
+	   	<tag>zookeeper-starter-1.0.1-SNAPSHOT</tag>
 	</scm>
-  
+
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<java.version>1.8</java.version>
 	</properties>
-	<name>service-A</name>
-	<description>Spring Cloud project</description>
+	<name>zookeeper-starter</name>
+	<description>zookeeper wrapper</description>
 
 	<parent>
 		<groupId>org.springframework.boot</groupId>
@@ -134,7 +132,7 @@
 					<plugin>
 						<groupId>org.apache.maven.plugins</groupId>
 						<artifactId>maven-gpg-plugin</artifactId>
-						<version>1.8</version>
+						<version>1.6</version>
 						<executions>
 							<execution>
 								<id>sign-artifacts</id>
