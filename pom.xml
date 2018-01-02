@@ -2,8 +2,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.xsnake</groupId>
   <artifactId>zookeeper-starter</artifactId>
-  <version>1.0.1</version>
-  
+  <version>1.0.2</version>
 	<organization>
 		<name>xsnake</name>
 		<url>http://www.xsnake.org</url>
