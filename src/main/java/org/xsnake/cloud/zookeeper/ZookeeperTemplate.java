@@ -25,8 +25,8 @@ public class ZookeeperTemplate {
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
-	public void $dir(String node) throws KeeperException, InterruptedException, IOException {
-		dir(node, null, CreateMode.EPHEMERAL);
+	public void $node(String node) throws IOException {
+		node(node, null, CreateMode.EPHEMERAL);
 	}
 	
 	/**
@@ -37,8 +37,8 @@ public class ZookeeperTemplate {
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
-	public void $dir(String node,byte[] data) throws KeeperException, InterruptedException, IOException {
-		dir(node, data, CreateMode.EPHEMERAL);
+	public void $node(String node,byte[] data) throws IOException {
+		node(node, data, CreateMode.EPHEMERAL);
 	}
 
 	/**
@@ -48,8 +48,8 @@ public class ZookeeperTemplate {
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
-	public void dir(String node) throws KeeperException, InterruptedException, IOException {
-		dir(node, null, CreateMode.PERSISTENT);
+	public void node(String node) throws IOException {
+		node(node, null, CreateMode.PERSISTENT);
 	}
 
 	/**
@@ -60,8 +60,8 @@ public class ZookeeperTemplate {
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
-	public void dir(String node,byte[] data) throws KeeperException, InterruptedException, IOException {
-		dir(node, data, CreateMode.PERSISTENT);
+	public void node(String node,byte[] data) throws IOException {
+		node(node, data, CreateMode.PERSISTENT);
 	}
 	
 	/**
@@ -73,12 +73,16 @@ public class ZookeeperTemplate {
 	 * @throws InterruptedException
 	 * @throws IOException
 	 */
-	private void dir(String path,byte[] value,CreateMode createMode)throws KeeperException, InterruptedException, IOException{
+	private void node(String path,byte[] value,CreateMode createMode) throws IOException{
 		byte[] data = value != null ? value : null;
-		if(zooKeeper.exists(path, null)==null){
-			zooKeeper.create(path, data, ZooDefs.Ids.OPEN_ACL_UNSAFE, createMode);
-		}else{
-			zooKeeper.setData(path, data, -1);
+		try{
+			if(zooKeeper.exists(path, null)==null){
+				zooKeeper.create(path, data, ZooDefs.Ids.OPEN_ACL_UNSAFE, createMode);
+			}else{
+				zooKeeper.setData(path, data, -1);
+			}
+		}catch (Exception e) {
+			throw new IOException(e.getMessage());
 		}
 	}
 	
@@ -89,14 +93,13 @@ public class ZookeeperTemplate {
 	 * @throws KeeperException
 	 * @throws InterruptedException
 	 */
-	public byte[] data(String path) throws KeeperException, InterruptedException{
-		byte[] data = zooKeeper.getData(path, null, null);
-		if(data == null){
-			return null;
+	public byte[] data(String path) throws IOException{
+		try{
+			return zooKeeper.getData(path, null, null);
+		}catch (Exception e) {
+			throw new IOException(e.getMessage());
 		}
-		return data;
 	}
-	
 	
 	/**
 	 * 判断是否存在
@@ -105,41 +108,47 @@ public class ZookeeperTemplate {
 	 * @throws KeeperException
 	 * @throws InterruptedException
 	 */
-	public boolean exists(String path) throws KeeperException, InterruptedException{
-		return zooKeeper.exists(path, null)!=null;
-	}
-	
-	public void delete(String path) throws InterruptedException, KeeperException{
-		zooKeeper.delete(path, -1);
-	}
-	
-	public void onChange(String path,Watcher watcher) throws KeeperException, InterruptedException{
-		zooKeeper.getChildren(path, new PermanentWatcher(zooKeeper,path,watcher));
-	}
-	
-	public List<String> getChildren(String path) throws KeeperException, InterruptedException{
-		return zooKeeper.getChildren(path,null);
-	}
-	
-	public static class PermanentWatcher implements Watcher{
-		ZooKeeper zk;
-		String path;
-		Watcher watcher;
-		public PermanentWatcher(ZooKeeper _zooKeeper,String path,Watcher watcher){
-			this.zk = _zooKeeper;
-			this.path = path;
-			this.watcher = watcher;
+	public boolean exists(String path) throws IOException{
+		try{
+			return zooKeeper.exists(path, null)!=null;
+		}catch (Exception e) {
+			throw new IOException(e.getMessage());
 		}
-		@Override
-		public void process(WatchedEvent event) {
-			try {
-				watcher.process(event);
-				zk.getChildren(path, new PermanentWatcher(zk,path,watcher));
-			} catch (KeeperException e) {
-				e.printStackTrace();
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+	}
+	
+	public void delete(String path) throws IOException{
+		try{
+			zooKeeper.delete(path, -1);
+		}catch (Exception e) {
+			throw new IOException(e.getMessage());
+		}
+	}
+	
+	public void onChange(String path,Watcher watcher) throws IOException{
+		try{
+			zooKeeper.getChildren(path, new Watcher() {
+				@Override
+				public void process(WatchedEvent event) {
+					try {
+						watcher.process(event);
+						zooKeeper.getChildren(path, this);
+					} catch (KeeperException e) {
+						e.printStackTrace();
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+				}
+			});
+		}catch (Exception e) {
+			throw new IOException(e.getMessage());
+		}
+	}
+	
+	public List<String> list(String path) throws IOException{
+		try{
+			return zooKeeper.getChildren(path,null);
+		}catch (Exception e) {
+			throw new IOException(e.getMessage());
 		}
 	}
 	
